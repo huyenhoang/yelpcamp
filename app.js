@@ -5,30 +5,14 @@ var express      = require("express"),
     Campground   = require("./models/campground"),
     seedDB       = require("./seeds")
     
-seedDB();
-
 // connect to db
 mongoose.connect("mongodb://localhost/yelp_camp");
-
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+seedDB();
 
-/* Campground.create(
-    {
-        name: "Granite Hill",
-        image: "https://images.unsplash.com/photo-1500581276021-a4bbcd0050c5?auto=format&fit=crop&w=1050&q=80",
-        description: "This is a huge granite hill, no bathrooms. No water. Beautiful granite!"
-    
-    }, function(err, campground) {
-        if(err){
-            console.log(err);
-        } else {
-            console.log("Newly created campground: ");
-            console.log(campground);
-        }
-    });
-
+/*
 var campgrounds = [
     {name: "Salmon Creek", image: "https://images.unsplash.com/photo-1505735754789-3404132203ed?auto=format&fit=crop&w=1050&q=80"},
     {name: "Granite Hill", image: "https://images.unsplash.com/photo-1500581276021-a4bbcd0050c5?auto=format&fit=crop&w=1050&q=80"},        
@@ -52,7 +36,7 @@ app.get("/campgrounds", function(req, res){
     });
 });
 
-// Creat - Add new campground to DB 
+// Create - Add new campground to DB 
 app.post("/campgrounds", function(req, res){
     // get data from form and add to the campground array
     var name = req.body.name;
@@ -78,10 +62,11 @@ app.get("/campgrounds/new", function(req, res){
 // Show more info about one campground
 app.get("/campgrounds/:id", function(req, res){
     // find campground with provided ID
-    Campground.findById(req.params.id, function(err, foundCampground){
+    Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground){
         if(err){
             console.log(err);
         } else  {
+            console.log(foundCampground);
             //rend show template with that campground
             res.render("show", {campground: foundCampground});    
         }
