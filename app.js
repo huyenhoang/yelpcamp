@@ -4,21 +4,14 @@ var express      = require("express"),
     mongoose     = require("mongoose"),
     Campground   = require("./models/campground"),
     Comment      = require("./models/comment"),
-    seedDB       = require("./seeds")
+    seedDB       = require("./seeds");
     
+// connect to db
 mongoose.connect("mongodb://localhost/yelp_camp");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
 seedDB();
-
-/*
-var campgrounds = [
-    {name: "Salmon Creek", image: "https://images.unsplash.com/photo-1505735754789-3404132203ed?auto=format&fit=crop&w=1050&q=80"},
-    {name: "Granite Hill", image: "https://images.unsplash.com/photo-1500581276021-a4bbcd0050c5?auto=format&fit=crop&w=1050&q=80"},        
-    {name: "Angel's Rest", image: "https://images.unsplash.com/photo-1487730116645-74489c95b41b?auto=format&fit=crop&w=1050&q=80"},
-    {name: "Silver Falls", image: "https://images.unsplash.com/photo-1504851149312-7a075b496cc7?auto=format&fit=crop&w=1050&q=80"},
-];*/
 
 // Landing page
 app.get("/", function(req, res){
@@ -85,32 +78,31 @@ app.get("/campgrounds/:id/comments/new", function(req, res){
         } else {
             res.render("comments/new", {campground: campground});
         }
-    })
-})
+    });
+});
 
 app.post("/campgrounds/:id/comments", function(req, res){
     //lookup campground using ID
     Campground.findById(req.params.id, function(err, campground){
-       if(err){
+        if(err){
            console.log(err);
            res.redirect("/campgrounds");
-       } else {
-           Comment.create(req.body.comment, function(err, comment){
+        } else {
+            //create new comment
+            Comment.create(req.body.comment, function(err, comment){
                if(err){
                    console.log(err);
                } else {
+                   //connect new comment to campground
                    campground.comments.push(comment);
                    campground.save();
-                   res.redirect('/campgrounds/' + campground._id);
+                    //redirect to campground show page
+                   res.redirect('/campgrounds/'+ campground._id);
                }
            });
        }
     });
-    //create new comment
-    //connect new comment to campground
-    //redirect to campground show page
-    
-})
+});
 
 app.listen(process.env.PORT, process.env.IP, function(){
     console.log("YelpCamp started");
