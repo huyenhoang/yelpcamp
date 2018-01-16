@@ -41,6 +41,9 @@ passport.deserializeUser(User.deserializeUser());
 
 app.use(function(req, res, next){
     res.locals.currentUser = req.user;
+    //allows flash messaging to be used on every route via the current user.
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
     next();
 });
 
